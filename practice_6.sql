@@ -32,4 +32,30 @@ FROM pages as a
 left join page_likes as b 
 on a.page_id=b.page_id
 where liked_date is null
-order by page_id
+order by page_id;
+--ex5
+select 
+7 as month,
+count(distinct user_id) as monthly_active_user
+from user_actions
+where exists(
+select distinct user_id as active_users
+from user_actions
+where event_id is not null
+and (extract(year from event_date)='2022'
+and extract (month from event_date)='7'))
+and extract (month from event_date)='6'
+and extract (year from event_date)='2022'
+group by extract (month from event_date)='7';
+--ex6
+select
+to_char(trans_date, 'YYYY-MM') as month,
+country,
+count(id) as trans_count,
+sum (case when state= 'approved'then 1 else 0 end) as approved_count,
+sum(amount) as trans_total_amount,
+sum(case when state='approved' then amount else 0 end) as approved_total_amount
+from Transactions 
+group by to_char(trans_date, 'YYYY-MM'), country;
+--ex7
+
