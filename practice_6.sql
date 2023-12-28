@@ -109,5 +109,41 @@ count(distinct company_id) as duplicate_comany
 from double_job_listings
 where job_count>=2
 --ex11
+with cte_1 
+as (select user_id, count(rating) as count
+from MovieRating
+group by user_id),
+
+cte_2
+as(select movie_id, avg(rating)as avg
+from MovieRating
+where extract (year from created_at)=2020 and extract (month from created_at)=2
+group by movie_id)
+
+(select name as results
+from Users
+join cte_1 on cte_1.user_id=Users.user_id
+where cte_1.count=(select max(count) from cte_1)
+order by name
+limit 1)
+
+union all
+
+(select title as results
+from Movies
+join cte_2 on Movies.movie_id=cte_2.movie_id
+where cte_2.AVG=(select max(avg) from cte_2)
+order by title 
+limit 1);
+--ex12
+select id, COUNT(*) as num 
+from (
+    select requester_id as id from RequestAccepted
+    union all
+    select accepter_id from RequestAccepted
+) as friends_count
+group by id
+order by num DESC
+limit 1;
 
 
