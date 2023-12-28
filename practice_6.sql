@@ -58,4 +58,56 @@ sum(case when state='approved' then amount else 0 end) as approved_total_amount
 from Transactions 
 group by to_char(trans_date, 'YYYY-MM'), country;
 --ex7
+with cte as
+(select product_id,
+min(year) as year_1
+from Sales
+group by product_id)
+
+select
+a.product_id, year as first_year,
+b.quantity, b.price
+from cte as a
+inner join Sales as b
+on a.product_id=b.product_id
+and a. year_1=b.year
+---hoặc
+select 
+product_id, year as first_year,
+quantity, price
+from Sales
+where (product_id, year) in ((select product_id,
+min(year) 
+from Sales
+group by product_id))
+--ex8
+select customer_id
+from Customer
+group by customer_id
+having count(distinct product_key)=(Select count(product_key) from Product)
+--ex9
+select e.employee_id
+from employees as e
+left join employees as mng
+on e.manager_id=mng.employee_id
+where e.salary<30000
+and mng.employee_id is null
+and e.manager_id is not null
+order by e.employee_id
+--ex10
+With double_job_listings
+as(
+select company_id,
+title,
+description,
+count(job_id) as job_count
+from job_listings
+group by company_id, title, description)
+
+SELECT 
+count(distinct company_id) as duplicate_comany
+from double_job_listings
+where job_count>=2
+--ex11
+
 
