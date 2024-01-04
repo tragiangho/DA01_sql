@@ -13,6 +13,19 @@ count(distinct company_id) as duplicate_comany
 from double_job_listings
 where job_count>=2;
 --ex2
+with cte_1 
+as (select category, product,
+sum(spend) as total_spend
+from product_spend
+where extract(year from transaction_date)=2022
+group by product, category),
+cte_2 as(
+select *, rank() over(PARTITION BY category order by total_spend DESC) as rk
+from cte_1)
+select 
+category, product, total_spend
+from cte_2
+where rk<=2
 --ex3
 With cte_callers
 as(
