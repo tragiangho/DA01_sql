@@ -22,3 +22,16 @@ else ID
 end as ID, STUDENT
 from Seat
 order by id
+--ex4
+with total_cte as
+(select distinct visited_on, 
+sum(amount) over (order by visited_on
+range between interval '6' day preceding and current row) as amount
+from Customer)
+select visited_on, amount, round(amount/7.0, 2) as average_amount
+from total_cte as a
+INNER JOIN
+(SELECT MIN(visited_on) AS min_visited_on FROM total_cte) AS b
+ON DATE_PART('day',visited_on) - DATE_PART('day', min_visited_on) >= 6
+order by visited_on asc
+--ex5
